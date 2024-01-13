@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
 use egui::{Align2, Color32, DragValue, Stroke, Ui};
-use quantum::{SpinState, SZ_POSITIVE_STATE, Complex, b_field};
+use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
 use threegui::{ThreeUi, Vec3};
 
 mod quantum;
@@ -54,12 +54,14 @@ fn main() {
 pub struct TemplateApp {
     theta: f32,
     initial_state: SpinState,
+    b_field_strength: f32,
     time: f32,
 }
 
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
+            b_field_strength: 1.0,
             theta: 0.,
             initial_state: quantum::SZ_POSITIVE_STATE,
             time: 0.,
@@ -94,10 +96,16 @@ impl eframe::App for TemplateApp {
                     .suffix(" rads")
                     .speed(1e-2),
             );
+            ui.add(
+                DragValue::new(&mut self.b_field_strength)
+                    .prefix("Field strength: ")
+                    .suffix(" rads")
+                    .speed(1e-2),
+            );
 
             ui.strong("Initial state");
-            edit_complex(ui, &mut self.initial_state.x, "A: ");
-            edit_complex(ui, &mut self.initial_state.y, "B: ");
+            edit_complex(ui, &mut self.initial_state.x, "a: ");
+            edit_complex(ui, &mut self.initial_state.y, "b: ");
             // TODO: Normalize button
         });
 
@@ -109,8 +117,22 @@ impl eframe::App for TemplateApp {
 impl TemplateApp {
     fn ui_3d(&mut self, three: &mut ThreeUi) {
         axes(three);
-        let b_field: mint::Vector3<f32> = b_field(self.theta).into();
+        let b_field: mint::Vector3<f32> = b_field(self.theta, self.b_field_strength).into();
         label_line(three, b_field.into(), Color32::YELLOW, "B");
+
+        let spin_vector: mint::Vector3<f32> = spin_expectation(
+            self.theta,
+            self.initial_state,
+            self.b_field_strength,
+            self.time,
+        )
+        .into();
+        label_line(
+            three,
+            spin_vector.into(),
+            Color32::from_rgb(126, 18, 182),
+            "<S>",
+        );
     }
 }
 
