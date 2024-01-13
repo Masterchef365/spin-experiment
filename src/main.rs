@@ -26,7 +26,7 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
     eframe::run_native(
-        "eframe template",
+        "Spin experiment for PH451",
         native_options,
         Box::new(|cc| Box::new(TemplateApp::new(cc))),
     )
