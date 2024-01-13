@@ -136,6 +136,11 @@ impl eframe::App for TemplateApp {
                     .speed(1e-2),
             );
 
+            ui.separator();
+            ui.strong("Internals");
+            let psi = quantum::psi(self.theta, self.initial_state, self.b_field_strength, self.time);
+            ui.label(format!("ψ: a={:.02} b={:.02}", psi.x, psi.y));
+
 
             // TODO: Normalize button
         });
