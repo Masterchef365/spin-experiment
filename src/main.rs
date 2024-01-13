@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use egui::{Align2, Color32, DragValue, Stroke, Ui};
 use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
-use threegui::{ThreeUi, Vec3};
+use threegui::{ThreeUi, Vec3, utils};
 
 mod quantum;
 
@@ -147,6 +147,8 @@ impl eframe::App for TemplateApp {
 
 impl TemplateApp {
     fn ui_3d(&mut self, three: &mut ThreeUi) {
+        utils::grid(three.painter(), 10, 1., Stroke::new(1.0, Color32::from_gray(45)));
+
         axes(three);
         let b_field: mint::Vector3<f32> = b_field(self.theta, self.b_field_strength).into();
         label_line(three, b_field.into(), Color32::YELLOW, "B");
@@ -158,12 +160,23 @@ impl TemplateApp {
             self.time,
         )
         .into();
+
         label_line(
             three,
             spin_vector.into(),
-            Color32::from_rgb(126, 18, 182),
+            Color32::from_rgb(156, 47, 214),
             "<S>",
         );
+
+        /*
+        let mut projected = spin_vector;
+        projected.y = 0.;
+        three.painter().line(
+            spin_vector.into(),
+            projected.into(),
+            Stroke::new(1.0, Color32::DARK_GRAY),
+        );
+        */
     }
 }
 
