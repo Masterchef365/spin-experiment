@@ -1,7 +1,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
-use threegui::ThreeUi;
+use egui::{Align2, Color32, Stroke};
+use threegui::{ThreeUi, Vec3};
 
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
@@ -74,27 +75,32 @@ impl TemplateApp {
 impl eframe::App for TemplateApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            threegui::threegui(ui, |three| self.ui_3d(three))
-        });
+        egui::CentralPanel::default()
+            .show(ctx, |ui| threegui::threegui(ui, |three| self.ui_3d(three)));
     }
 }
 
 impl TemplateApp {
     fn ui_3d(&mut self, three: &mut ThreeUi) {
+        axes(three);
     }
 }
 
-fn powered_by_egui_and_eframe(ui: &mut egui::Ui) {
-    ui.horizontal(|ui| {
-        ui.spacing_mut().item_spacing.x = 0.0;
-        ui.label("Powered by ");
-        ui.hyperlink_to("egui", "https://github.com/emilk/egui");
-        ui.label(" and ");
-        ui.hyperlink_to(
-            "eframe",
-            "https://github.com/emilk/egui/tree/master/crates/eframe",
+fn axes(three: &mut ThreeUi) {
+    let paint = three.painter();
+
+    for (dim, color, name) in [
+        (Vec3::X, Color32::RED, "X"),
+        (Vec3::Y, Color32::GREEN, "Y"),
+        (Vec3::Z, Color32::LIGHT_BLUE, "Z"),
+    ] {
+        paint.line(Vec3::ZERO, dim, Stroke::new(1., color));
+        paint.text(
+            dim * 1.1,
+            Align2::CENTER_CENTER,
+            name,
+            Default::default(),
+            color,
         );
-        ui.label(".");
-    });
+    }
 }
