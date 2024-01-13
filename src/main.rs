@@ -67,12 +67,12 @@ pub struct TemplateApp {
 impl Default for TemplateApp {
     fn default() -> Self {
         Self {
-            b_field_strength: 1.0,
-            theta: 0.,
+            b_field_strength: 0.9,
+            theta: 0.17,
             initial_state: quantum::SZ_POSITIVE_STATE,
             time: 0.,
 
-            play: false,
+            play: true,
             anim_speed: 1.,
 
             delta_time: Instant::now(),
