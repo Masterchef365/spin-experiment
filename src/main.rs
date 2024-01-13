@@ -9,6 +9,11 @@ use threegui::{utils, ThreeUi, Vec3};
 
 mod quantum;
 
+fn is_mobile(ctx: &egui::Context) -> bool {
+    use egui::os::OperatingSystem;
+    matches!(ctx.os(), OperatingSystem::Android | OperatingSystem::IOS)
+}
+
 // When compiling natively:
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result<()> {
@@ -124,56 +129,11 @@ impl eframe::App for TemplateApp {
             self.tracing.clear();
         }
 
-        egui::SidePanel::left("panel").show(ctx, |ui| {
-            ui.strong("Parameters");
-            ui.add(DragValue::new(&mut self.time).prefix("Time: ").speed(1e-2));
-            ui.add(
-                DragValue::new(&mut self.theta)
-                    .prefix("Angle θ: ")
-                    .suffix(" rads")
-                    .speed(1e-2),
-            );
-            ui.add(
-                DragValue::new(&mut self.b_field_strength)
-                    .prefix("Field strength: ")
-                    .speed(1e-2),
-            );
-
-            /*
-            ui.strong("Initial state");
-            let speed = 1e-2;
-            edit_complex(ui, &mut self.initial_state.x, "a: ", speed);
-            edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
-            */
-
-            ui.separator();
-            ui.strong("Animation");
-            ui.checkbox(&mut self.play, "Play animation");
-            ui.add(
-                DragValue::new(&mut self.anim_speed)
-                    .prefix("Speed: ")
-                    .suffix("x")
-                    .speed(1e-2),
-            );
-
-            ui.separator();
-            ui.strong("Internals");
-            let psi = quantum::psi(
-                self.theta,
-                self.initial_state,
-                self.b_field_strength,
-                self.time,
-            );
-            ui.label("Spin wave function ψ");
-            ui.label(format!("a = {:.02}", psi.x));
-            ui.label(format!("b = {:.02}", psi.y));
-
-            ui.separator();
-            ui.strong("Visualization");
-            ui.checkbox(&mut self.trace, "Trace spin vector");
-
-            // TODO: Normalize button
-        });
+        if is_mobile(ctx) {
+            egui::TopBottomPanel::bottom("panel").show(ctx, |ui| self.settings_panel(ui));
+        } else {
+            egui::SidePanel::left("panel").show(ctx, |ui| self.settings_panel(ui));
+        }
 
         egui::CentralPanel::default()
             .show(ctx, |ui| threegui::threegui(ui, |three| self.ui_3d(three)));
@@ -222,6 +182,57 @@ impl TemplateApp {
         Stroke::new(1.0, Color32::DARK_GRAY),
         );
         */
+    }
+
+    fn settings_panel(&mut self, ui: &mut Ui) {
+        ui.strong("Parameters");
+        ui.add(DragValue::new(&mut self.time).prefix("Time: ").speed(1e-2));
+        ui.add(
+            DragValue::new(&mut self.theta)
+                .prefix("Angle θ: ")
+                .suffix(" rads")
+                .speed(1e-2),
+        );
+        ui.add(
+            DragValue::new(&mut self.b_field_strength)
+                .prefix("Field strength: ")
+                .speed(1e-2),
+        );
+
+        /*
+        ui.strong("Initial state");
+        let speed = 1e-2;
+        edit_complex(ui, &mut self.initial_state.x, "a: ", speed);
+        edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
+        */
+
+        ui.separator();
+        ui.strong("Animation");
+        ui.checkbox(&mut self.play, "Play animation");
+        ui.add(
+            DragValue::new(&mut self.anim_speed)
+                .prefix("Speed: ")
+                .suffix("x")
+                .speed(1e-2),
+        );
+
+        ui.separator();
+        ui.strong("Internals");
+        let psi = quantum::psi(
+            self.theta,
+            self.initial_state,
+            self.b_field_strength,
+            self.time,
+        );
+        ui.label("Spin wave function ψ");
+        ui.label(format!("a = {:.02}", psi.x));
+        ui.label(format!("b = {:.02}", psi.y));
+
+        ui.separator();
+        ui.strong("Visualization");
+        ui.checkbox(&mut self.trace, "Trace spin vector");
+
+        // TODO: Normalize button
     }
 }
 
