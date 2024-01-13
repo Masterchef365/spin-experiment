@@ -76,11 +76,11 @@ impl TemplateApp {
     }
 }
 
-fn edit_complex(ui: &mut Ui, cpx: &mut Complex, name: &str) {
+fn edit_complex(ui: &mut Ui, cpx: &mut Complex, name: &str, speed: f32) {
     ui.horizontal(|ui| {
         ui.label(name);
-        ui.add(DragValue::new(&mut cpx.re).prefix("Re: "));
-        ui.add(DragValue::new(&mut cpx.im).prefix("Im: "));
+        ui.add(DragValue::new(&mut cpx.re).prefix("Re: ").speed(speed));
+        ui.add(DragValue::new(&mut cpx.im).prefix("Im: ").speed(speed));
     });
 }
 
@@ -104,8 +104,9 @@ impl eframe::App for TemplateApp {
             );
 
             ui.strong("Initial state");
-            edit_complex(ui, &mut self.initial_state.x, "a: ");
-            edit_complex(ui, &mut self.initial_state.y, "b: ");
+            let speed = 1e-2;
+            edit_complex(ui, &mut self.initial_state.x, "a: ", speed);
+            edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
             // TODO: Normalize button
         });
 
