@@ -1,9 +1,9 @@
 [package]
 name = "spin-experiment"
 version = "0.1.0"
-authors = ["Emil Ernerfeldt <emil.ernerfeldt@gmail.com>"]
+authors = ["Duncan Freeman <duncan.freeman1@gmail.com>"]
 edition = "2021"
-rust-version = "1.72"
+#rust-version = "1.72"
 
 
 [dependencies]
@@ -15,8 +15,8 @@ eframe = { version = "0.25.0", default-features = false, features = [
     "persistence",   # Enable restoring app state when restarting the app.
 ] }
 log = "0.4"
-#threegui = { git = "https://github.com/Masterchef365/threegui.git", branch = "main" }
-threegui = { path = "../threegui" }
+threegui = { git = "https://github.com/Masterchef365/threegui.git", branch = "main" }
+#threegui = { path = "../threegui" }
 nalgebra = { version = "0.32", features = ["mint"] }
 mint = "0.5"
 
