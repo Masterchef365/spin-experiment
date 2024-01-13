@@ -164,7 +164,7 @@ impl TemplateApp {
         label_line(
             three,
             spin_vector.into(),
-            Color32::from_rgb(156, 47, 214),
+            Color32::LIGHT_BLUE,
             "<S>",
         );
 
@@ -183,7 +183,7 @@ impl TemplateApp {
 fn axes(three: &mut ThreeUi) {
     label_line(three, Vec3::X, Color32::RED, "X");
     label_line(three, Vec3::Y, Color32::GREEN, "Y");
-    label_line(three, Vec3::Z, Color32::LIGHT_BLUE, "Z");
+    label_line(three, Vec3::Z, Color32::BLUE, "Z");
 }
 
 fn label_line(three: &mut ThreeUi, v: Vec3, color: Color32, name: &str) {
