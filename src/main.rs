@@ -61,7 +61,6 @@ pub struct TemplateApp {
     play: bool,
     anim_speed: f32,
 
-    delta_time: Instant,
     trace: bool,
     tracing: Vec<Vec3>,
 }
@@ -77,7 +76,6 @@ impl Default for TemplateApp {
             play: true,
             anim_speed: 1.,
 
-            delta_time: Instant::now(),
             trace: false,
             tracing: vec![],
         }
@@ -104,9 +102,8 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if self.play {
             ctx.request_repaint();
-            self.time += self.delta_time.elapsed().as_secs_f32() * self.anim_speed;
+            self.time += ctx.input(|r| r.stable_dt) * self.anim_speed;
         }
-        self.delta_time = Instant::now();
 
         if self.trace {
             let spin_vector: mint::Vector3<f32> = spin_expectation(
@@ -139,7 +136,6 @@ impl eframe::App for TemplateApp {
             ui.add(
                 DragValue::new(&mut self.b_field_strength)
                     .prefix("Field strength: ")
-                    .suffix(" rads")
                     .speed(1e-2),
             );
 
