@@ -120,10 +120,12 @@ impl eframe::App for TemplateApp {
                     .speed(1e-2),
             );
 
+            /*
             ui.strong("Initial state");
             let speed = 1e-2;
             edit_complex(ui, &mut self.initial_state.x, "a: ", speed);
             edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
+            */
 
             ui.strong("Animation");
             ui.checkbox(&mut self.play, "Play animation");

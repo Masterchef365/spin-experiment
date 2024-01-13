@@ -42,7 +42,7 @@ fn expi(t: f32) -> Complex {
     Complex::new(t.cos(), t.sin())
 }
 
-pub fn psi(theta: f32, initial_state: SpinState, b_field_strength: f32, time: f32) -> SpinState {
+pub fn psi(theta: f32, _initial_state: SpinState, b_field_strength: f32, time: f32) -> SpinState {
     // Magnitude of energy (same for both states
     let energy = b_field_strength;
     let omega = energy / H_BAR;
@@ -51,7 +51,7 @@ pub fn psi(theta: f32, initial_state: SpinState, b_field_strength: f32, time: f3
     let psi_1 = SpinState::new((theta.cos() + 1.0).into(), theta.sin().into());
     let psi_2 = SpinState::new((theta.cos() - 1.0).into(), theta.sin().into());
 
-    (psi_1 * expi(-omega * time) + psi_2 * expi(omega * time)) / Complex::from(2.)
+    (psi_1 * expi(omega * time) - psi_2 * expi(-omega * time)) / Complex::from(2.)
 }
 
 pub fn spin_expectation(
