@@ -5,7 +5,7 @@ use std::time::Instant;
 
 use egui::{Align2, Color32, DragValue, Stroke, Ui};
 use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
-use threegui::{ThreeUi, Vec3, utils};
+use threegui::{utils, ThreeUi, Vec3};
 
 mod quantum;
 
@@ -62,6 +62,8 @@ pub struct TemplateApp {
     anim_speed: f32,
 
     delta_time: Instant,
+    trace: bool,
+    tracing: Vec<Vec3>,
 }
 
 impl Default for TemplateApp {
@@ -76,6 +78,8 @@ impl Default for TemplateApp {
             anim_speed: 1.,
 
             delta_time: Instant::now(),
+            trace: false,
+            tracing: vec![],
         }
     }
 }
@@ -103,6 +107,19 @@ impl eframe::App for TemplateApp {
             self.time += self.delta_time.elapsed().as_secs_f32() * self.anim_speed;
         }
         self.delta_time = Instant::now();
+
+        if self.trace {
+            let spin_vector: mint::Vector3<f32> = spin_expectation(
+                self.theta,
+                self.initial_state,
+                self.b_field_strength,
+                self.time,
+            )
+            .into();
+            self.tracing.push(spin_vector.into());
+        } else {
+            self.tracing.clear();
+        }
 
         egui::SidePanel::left("panel").show(ctx, |ui| {
             ui.strong("Parameters");
@@ -139,14 +156,19 @@ impl eframe::App for TemplateApp {
 
             ui.separator();
             ui.strong("Internals");
-            let psi = quantum::psi(self.theta, self.initial_state, self.b_field_strength, self.time);
+            let psi = quantum::psi(
+                self.theta,
+                self.initial_state,
+                self.b_field_strength,
+                self.time,
+            );
             ui.label("Spin wave function ψ");
             ui.label(format!("a = {:.02}", psi.x));
             ui.label(format!("b = {:.02}", psi.y));
 
             ui.separator();
             ui.strong("Visualization");
-
+            ui.checkbox(&mut self.trace, "Trace spin vector");
 
             // TODO: Normalize button
         });
@@ -158,12 +180,22 @@ impl eframe::App for TemplateApp {
 
 impl TemplateApp {
     fn ui_3d(&mut self, three: &mut ThreeUi) {
-        utils::grid(three.painter(), 10, 1., Stroke::new(1.0, Color32::from_gray(45)));
+        // Draw grid
+        utils::grid(
+            three.painter(),
+            10,
+            1.,
+            Stroke::new(1.0, Color32::from_gray(45)),
+        );
 
+        // Draw axes
         axes(three);
+
+        // Draw B field
         let b_field: mint::Vector3<f32> = b_field(self.theta, self.b_field_strength).into();
         label_line(three, b_field.into(), Color32::YELLOW, "B");
 
+        // Draw spin vector
         let spin_vector: mint::Vector3<f32> = spin_expectation(
             self.theta,
             self.initial_state,
@@ -171,21 +203,21 @@ impl TemplateApp {
             self.time,
         )
         .into();
+        label_line(three, spin_vector.into(), Color32::LIGHT_BLUE, "<S>");
 
-        label_line(
-            three,
-            spin_vector.into(),
-            Color32::LIGHT_BLUE,
-            "<S>",
-        );
+        // Draw tracing
+        let paint = three.painter();
+        for pair in self.tracing.windows(2) {
+            paint.line(pair[0], pair[1], Stroke::new(1., Color32::LIGHT_BLUE));
+        }
 
         /*
         let mut projected = spin_vector;
         projected.y = 0.;
         three.painter().line(
-            spin_vector.into(),
-            projected.into(),
-            Stroke::new(1.0, Color32::DARK_GRAY),
+        spin_vector.into(),
+        projected.into(),
+        Stroke::new(1.0, Color32::DARK_GRAY),
         );
         */
     }
