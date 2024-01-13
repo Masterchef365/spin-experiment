@@ -101,8 +101,8 @@ impl eframe::App for TemplateApp {
         if self.play {
             ctx.request_repaint();
             self.time += self.delta_time.elapsed().as_secs_f32() * self.anim_speed;
-            self.delta_time = Instant::now();
         }
+        self.delta_time = Instant::now();
 
         egui::SidePanel::left("panel").show(ctx, |ui| {
             ui.strong("Parameters");
