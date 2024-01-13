@@ -1,6 +1,8 @@
 #![warn(clippy::all, rust_2018_idioms)]
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
 
+use std::time::Instant;
+
 use egui::{Align2, Color32, DragValue, Stroke, Ui};
 use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
 use threegui::{ThreeUi, Vec3};
@@ -56,6 +58,10 @@ pub struct TemplateApp {
     initial_state: SpinState,
     b_field_strength: f32,
     time: f32,
+    play: bool,
+    anim_speed: f32,
+
+    delta_time: Instant,
 }
 
 impl Default for TemplateApp {
@@ -65,6 +71,11 @@ impl Default for TemplateApp {
             theta: 0.,
             initial_state: quantum::SZ_POSITIVE_STATE,
             time: 0.,
+
+            play: false,
+            anim_speed: 1.,
+
+            delta_time: Instant::now(),
         }
     }
 }
@@ -87,6 +98,12 @@ fn edit_complex(ui: &mut Ui, cpx: &mut Complex, name: &str, speed: f32) {
 impl eframe::App for TemplateApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        if self.play {
+            ctx.request_repaint();
+            self.time += self.delta_time.elapsed().as_secs_f32() * self.anim_speed;
+            self.delta_time = Instant::now();
+        }
+
         egui::SidePanel::left("panel").show(ctx, |ui| {
             ui.strong("Parameters");
             ui.add(DragValue::new(&mut self.time).prefix("Time: ").speed(1e-2));
@@ -107,6 +124,16 @@ impl eframe::App for TemplateApp {
             let speed = 1e-2;
             edit_complex(ui, &mut self.initial_state.x, "a: ", speed);
             edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
+
+            ui.strong("Animation");
+            ui.checkbox(&mut self.play, "Play animation");
+            ui.add(
+                DragValue::new(&mut self.anim_speed)
+                    .prefix("Speed: ")
+                    .speed(1e-2),
+            );
+
+
             // TODO: Normalize button
         });
 
