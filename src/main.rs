@@ -127,6 +127,7 @@ impl eframe::App for TemplateApp {
             edit_complex(ui, &mut self.initial_state.y, "b: ", speed);
             */
 
+            ui.separator();
             ui.strong("Animation");
             ui.checkbox(&mut self.play, "Play animation");
             ui.add(
@@ -139,7 +140,12 @@ impl eframe::App for TemplateApp {
             ui.separator();
             ui.strong("Internals");
             let psi = quantum::psi(self.theta, self.initial_state, self.b_field_strength, self.time);
-            ui.label(format!("ψ: a={:.02} b={:.02}", psi.x, psi.y));
+            ui.label("Spin wave function ψ");
+            ui.label(format!("a = {:.02}", psi.x));
+            ui.label(format!("b = {:.02}", psi.y));
+
+            ui.separator();
+            ui.strong("Visualization");
 
 
             // TODO: Normalize button
