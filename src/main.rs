@@ -76,7 +76,7 @@ impl Default for TemplateApp {
             play: true,
             anim_speed: 1.,
 
-            trace: false,
+            trace: true,
             tracing: vec![],
         }
     }
