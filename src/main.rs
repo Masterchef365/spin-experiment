@@ -116,6 +116,12 @@ impl eframe::App for TemplateApp {
                 self.time,
             )
             .into();
+
+            const MAX_TRACE_POINTS: usize = 1000;
+            if self.tracing.len() > MAX_TRACE_POINTS {
+                self.tracing.remove(0);
+            }
+
             self.tracing.push(spin_vector.into());
         } else {
             self.tracing.clear();
