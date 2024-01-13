@@ -130,6 +130,7 @@ impl eframe::App for TemplateApp {
             ui.add(
                 DragValue::new(&mut self.anim_speed)
                     .prefix("Speed: ")
+                    .suffix("x")
                     .speed(1e-2),
             );
 
