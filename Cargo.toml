@@ -17,6 +17,8 @@ eframe = { version = "0.25.0", default-features = false, features = [
 log = "0.4"
 #threegui = { git = "https://github.com/Masterchef365/threegui.git", branch = "main" }
 threegui = { path = "../threegui" }
+nalgebra = { version = "0.32", features = ["mint"] }
+mint = "0.5"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
