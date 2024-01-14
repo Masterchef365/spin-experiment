@@ -3,7 +3,7 @@
 
 use std::time::Instant;
 
-use egui::{Align2, Color32, DragValue, Stroke, Ui};
+use egui::{Align2, Color32, DragValue, ScrollArea, Stroke, Ui, WidgetText};
 use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
 use threegui::{utils, ThreeUi, Vec3};
 
@@ -68,6 +68,8 @@ pub struct TemplateApp {
 
     trace: bool,
     tracing: Vec<Vec3>,
+
+    show_psi_plot: bool,
 }
 
 impl Default for TemplateApp {
@@ -83,6 +85,8 @@ impl Default for TemplateApp {
 
             trace: true,
             tracing: vec![],
+
+            show_psi_plot: false,
         }
     }
 }
@@ -135,8 +139,12 @@ impl eframe::App for TemplateApp {
             egui::SidePanel::left("panel").show(ctx, |ui| self.settings_panel(ui));
         }
 
-        egui::CentralPanel::default()
-            .show(ctx, |ui| threegui::threegui(ui, |three| self.ui_3d(three)));
+        egui::CentralPanel::default().show(ctx, |ui| {
+            threegui::threegui(ui, |three| self.ui_3d(three));
+            if self.show_psi_plot {
+                self.plot_psi(ui);
+            }
+        });
     }
 }
 
@@ -184,6 +192,51 @@ impl TemplateApp {
         */
     }
 
+    fn psi(&self) -> SpinState {
+        quantum::psi(
+            self.theta,
+            self.initial_state,
+            self.b_field_strength,
+            self.time,
+        )
+    }
+
+    fn plot_psi(&mut self, ui: &mut Ui) {
+        ui.label("Wavefunction components");
+        let psi = self.psi();
+        egui_plot::Plot::new("psi")
+            .include_y(-1.0)
+            .include_y(1.0)
+            .include_x(-1.0)
+            .include_x(1.0)
+            .view_aspect(1.0)
+            //.data_aspect(1.0)
+            //.center_x_axis(true)
+            //.center_y_axis(true)
+            .width(300.)
+            //.height(200.)
+            .show(ui, |plot| {
+                for (cpx, color, name) in [
+                    (psi.x, Color32::LIGHT_BLUE, "a"),
+                    (psi.y, Color32::RED, "b"),
+                ] {
+                    let cpx = [cpx.re, cpx.im].map(|v| v as f64);
+                    let points = [[0., 0.], cpx];
+                    plot.line(
+                        egui_plot::Line::new(egui_plot::PlotPoints::new(points.to_vec()))
+                            .color(color),
+                    );
+                    plot.text(
+                        egui_plot::Text::new(
+                            cpx.into(),
+                            WidgetText::from(name).strong().color(color),
+                        )
+                        .anchor(Align2::LEFT_CENTER),
+                    );
+                }
+            });
+    }
+
     fn settings_panel(&mut self, ui: &mut Ui) {
         ui.strong("Parameters");
         ui.add(DragValue::new(&mut self.time).prefix("Time: ").speed(1e-2));
@@ -218,12 +271,7 @@ impl TemplateApp {
 
         ui.separator();
         ui.strong("Internals");
-        let psi = quantum::psi(
-            self.theta,
-            self.initial_state,
-            self.b_field_strength,
-            self.time,
-        );
+        let psi = self.psi();
         ui.label("Spin wave function ψ");
         ui.label(format!("a = {:.02}", psi.x));
         ui.label(format!("b = {:.02}", psi.y));
@@ -231,6 +279,7 @@ impl TemplateApp {
         ui.separator();
         ui.strong("Visualization");
         ui.checkbox(&mut self.trace, "Trace spin vector");
+        ui.checkbox(&mut self.show_psi_plot, "Show complex plane");
 
         // TODO: Normalize button
     }

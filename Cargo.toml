@@ -19,6 +19,7 @@ threegui = { git = "https://github.com/Masterchef365/threegui.git", branch = "ma
 #threegui = { path = "../threegui" }
 nalgebra = { version = "0.32", features = ["mint"] }
 mint = "0.5"
+egui_plot = "0.25"
 
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
