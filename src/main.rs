@@ -140,6 +140,7 @@ impl eframe::App for TemplateApp {
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
+            ui.label("3D plot");
             threegui::threegui(ui, |three| self.ui_3d(three));
             if self.show_psi_plot {
                 self.plot_psi(ui);
