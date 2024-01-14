@@ -179,7 +179,7 @@ impl TemplateApp {
 
         // Draw B field
         let b_field: mint::Vector3<f32> = b_field(self.theta, self.b_field_strength).into();
-        label_line(three, b_field.into(), Color32::YELLOW, "B");
+        label_line(three, b_field.into(), Color32::from_rgb(222, 230, 44), "B");
 
         // Draw spin vector
         let spin_vector: mint::Vector3<f32> = spin_expectation(
@@ -348,9 +348,9 @@ impl TemplateApp {
 }
 
 fn axes(three: &mut ThreeUi) {
-    label_line(three, Vec3::X, Color32::RED, "X");
-    label_line(three, Vec3::Y, Color32::GREEN, "Y");
-    label_line(three, Vec3::Z, Color32::BLUE, "Z");
+    label_line(three, Vec3::X, Color32::from_rgb(236, 52, 28), "X");
+    label_line(three, Vec3::Y, Color32::from_rgb(85, 230, 33), "Y");
+    label_line(three, Vec3::Z, Color32::from_rgb(28, 112, 232), "Z");
 }
 
 fn label_line(three: &mut ThreeUi, v: Vec3, color: Color32, name: &str) {
