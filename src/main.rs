@@ -3,7 +3,7 @@
 
 use std::time::Instant;
 
-use egui::{Align2, Color32, DragValue, ScrollArea, Stroke, Ui, WidgetText};
+use egui::{Align2, Color32, ComboBox, DragValue, ScrollArea, Stroke, Ui, WidgetText};
 use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
 use threegui::{utils, ThreeUi, Vec3};
 
@@ -289,6 +289,39 @@ impl TemplateApp {
         ui.strong("Visualization");
         ui.checkbox(&mut self.trace, "Trace spin vector");
         ui.checkbox(&mut self.show_psi_plot, "Show complex plane");
+
+        ui.separator();
+        ComboBox::from_id_source("Shortcuts").selected_text("Shortcuts").show_ui(ui, |ui| {
+            ui.horizontal(|ui| {
+                if ui.button("time -= π/4").clicked() {
+                    self.time -= std::f32::consts::FRAC_PI_4;
+                }
+                if ui.button("time += π/4").clicked() {
+                    self.time += std::f32::consts::FRAC_PI_4;
+                }
+            });
+
+            ui.horizontal(|ui| {
+                if ui.button("time -= π/2").clicked() {
+                    self.time -= std::f32::consts::FRAC_PI_2;
+                }
+                if ui.button("time += π/2").clicked() {
+                    self.time += std::f32::consts::FRAC_PI_2;
+                }
+            });
+
+            if ui.button("Reset time").clicked() {
+                self.time = Self::default().time;
+            }
+
+            if ui.button("Reset angle").clicked() {
+                self.theta = Self::default().theta;
+            }
+
+            if ui.button("Reset all").clicked() {
+                *self = Self::default();
+            }
+        });
 
         // TODO: Normalize button
     }
