@@ -68,6 +68,7 @@ pub struct TemplateApp {
 
     trace: bool,
     tracing: Vec<Vec3>,
+    max_trace_points: usize,
 
     show_psi_plot: bool,
     increment_angle: bool,
@@ -87,8 +88,9 @@ impl Default for TemplateApp {
             trace: true,
             tracing: vec![],
 
-            show_psi_plot: false,
+            show_psi_plot: true,
             increment_angle: false,
+            max_trace_points: 600,
         }
     }
 }
@@ -130,9 +132,13 @@ impl eframe::App for TemplateApp {
             )
             .into();
 
-            const MAX_TRACE_POINTS: usize = 1000;
-            if self.tracing.len() > MAX_TRACE_POINTS {
-                self.tracing.remove(0);
+            if self.tracing.len() > self.max_trace_points {
+                let idx = self
+                    .tracing
+                    .len()
+                    .checked_sub(self.max_trace_points)
+                    .unwrap_or(0);
+                self.tracing = self.tracing[idx..].to_vec();
             }
 
             self.tracing.push(spin_vector.into());
@@ -141,7 +147,9 @@ impl eframe::App for TemplateApp {
         }
 
         if is_mobile(ctx) {
-            egui::TopBottomPanel::bottom("panel").show(ctx, |ui| self.settings_panel(ui));
+            egui::TopBottomPanel::bottom("panel").show(ctx, |ui| {
+                ScrollArea::vertical().show(ui, |ui| self.settings_panel(ui))
+            });
         } else {
             egui::SidePanel::left("panel").show(ctx, |ui| self.settings_panel(ui));
         }
@@ -213,6 +221,7 @@ impl TemplateApp {
         ui.label("Wavefunction components");
         let psi = self.psi();
         egui_plot::Plot::new("psi")
+            .width(300.)
             .include_y(-1.0)
             .include_y(1.0)
             .include_x(-1.0)
@@ -221,7 +230,6 @@ impl TemplateApp {
             //.data_aspect(1.0)
             //.center_x_axis(true)
             //.center_y_axis(true)
-            .width(300.)
             //.height(200.)
             .show(ui, |plot| {
                 for (cpx, color, name) in [
@@ -291,25 +299,29 @@ impl TemplateApp {
         ui.checkbox(&mut self.show_psi_plot, "Show complex plane");
 
         ui.separator();
-        ComboBox::from_id_source("Shortcuts").selected_text("Shortcuts").show_ui(ui, |ui| {
-            ui.horizontal(|ui| {
-                if ui.button("time -= π/4").clicked() {
-                    self.time -= std::f32::consts::FRAC_PI_4;
-                }
-                if ui.button("time += π/4").clicked() {
-                    self.time += std::f32::consts::FRAC_PI_4;
-                }
-            });
+        ui.horizontal(|ui| {
+            if ui.button("θ -=  π/4").clicked() {
+                self.theta -= std::f32::consts::FRAC_PI_4;
+            }
+            if ui.button("θ +=  π/4").clicked() {
+                self.theta += std::f32::consts::FRAC_PI_4;
+            }
+        });
 
-            ui.horizontal(|ui| {
-                if ui.button("time -= π/2").clicked() {
-                    self.time -= std::f32::consts::FRAC_PI_2;
-                }
-                if ui.button("time += π/2").clicked() {
-                    self.time += std::f32::consts::FRAC_PI_2;
-                }
-            });
+        ui.horizontal(|ui| {
+            if ui.button("θ -=  π/2").clicked() {
+                self.theta -= std::f32::consts::FRAC_PI_2;
+            }
+            if ui.button("θ +=  π/2").clicked() {
+                self.theta += std::f32::consts::FRAC_PI_2;
+            }
+        });
 
+        if ui.button("Zero angle").clicked() {
+            self.theta = 0.;
+        }
+
+        ui.horizontal(|ui| {
             if ui.button("Reset time").clicked() {
                 self.time = Self::default().time;
             }
@@ -317,11 +329,19 @@ impl TemplateApp {
             if ui.button("Reset angle").clicked() {
                 self.theta = Self::default().theta;
             }
+        });
+
+        ui.horizontal(|ui| {
+            if ui.button("Reset trace").clicked() {
+                self.tracing.clear();
+            }
 
             if ui.button("Reset all").clicked() {
                 *self = Self::default();
             }
         });
+
+        ui.add(DragValue::new(&mut self.max_trace_points).prefix("Maximum traced points: "));
 
         // TODO: Normalize button
     }
