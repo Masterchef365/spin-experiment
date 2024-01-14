@@ -88,7 +88,7 @@ impl Default for TemplateApp {
             trace: true,
             tracing: vec![],
 
-            show_psi_plot: true,
+            show_psi_plot: false,
             increment_angle: false,
             max_trace_points: 600,
         }
@@ -97,8 +97,10 @@ impl Default for TemplateApp {
 
 impl TemplateApp {
     /// Called once before the first frame.
-    pub fn new(_cc: &eframe::CreationContext<'_>) -> Self {
-        Default::default()
+    pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
+        let mut inst = Self::default();
+        inst.show_psi_plot = !is_mobile(&cc.egui_ctx);
+        inst
     }
 }
 
