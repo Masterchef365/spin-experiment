@@ -148,10 +148,14 @@ impl eframe::App for TemplateApp {
 
         if is_mobile(ctx) {
             egui::TopBottomPanel::bottom("panel").show(ctx, |ui| {
-                ScrollArea::vertical().show(ui, |ui| self.settings_panel(ui))
+                ScrollArea::vertical().show(ui, |ui| {
+                    ScrollArea::vertical().show(ui, |ui| self.settings_panel(ui))
+                });
             });
         } else {
-            egui::SidePanel::left("panel").show(ctx, |ui| self.settings_panel(ui));
+            egui::SidePanel::left("panel").show(ctx, |ui| {
+                ScrollArea::vertical().show(ui, |ui| self.settings_panel(ui))
+            });
         }
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -299,6 +303,7 @@ impl TemplateApp {
         ui.checkbox(&mut self.show_psi_plot, "Show complex plane");
 
         ui.separator();
+        ui.strong("Shortcuts");
         ui.horizontal(|ui| {
             if ui.button("θ -=  π/4").clicked() {
                 self.theta -= std::f32::consts::FRAC_PI_4;
@@ -340,6 +345,11 @@ impl TemplateApp {
                 *self = Self::default();
             }
         });
+
+        if ui.button("Fast preset").clicked() {
+            self.anim_speed = 15.0;
+            self.max_trace_points = 100;
+        }
 
         ui.add(DragValue::new(&mut self.max_trace_points).prefix("Maximum traced points: "));
 
