@@ -70,6 +70,7 @@ pub struct TemplateApp {
     tracing: Vec<Vec3>,
 
     show_psi_plot: bool,
+    increment_angle: bool,
 }
 
 impl Default for TemplateApp {
@@ -87,6 +88,7 @@ impl Default for TemplateApp {
             tracing: vec![],
 
             show_psi_plot: false,
+            increment_angle: false,
         }
     }
 }
@@ -111,7 +113,12 @@ impl eframe::App for TemplateApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if self.play {
             ctx.request_repaint();
-            self.time += ctx.input(|r| r.stable_dt) * self.anim_speed;
+            let delta = ctx.input(|r| r.stable_dt) * self.anim_speed;
+            if self.increment_angle {
+                self.theta += delta;
+            } else {
+                self.time += delta;
+            }
         }
 
         if self.trace {
@@ -269,6 +276,7 @@ impl TemplateApp {
                 .suffix("x")
                 .speed(1e-2),
         );
+        ui.checkbox(&mut self.increment_angle, "Animate θ (constant t)");
 
         ui.separator();
         ui.strong("Internals");
