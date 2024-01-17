@@ -4,7 +4,7 @@
 use std::time::Instant;
 
 use egui::{Align2, Color32, ComboBox, DragValue, ScrollArea, Stroke, Ui, WidgetText};
-use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE};
+use quantum::{b_field, spin_expectation, Complex, SpinState, SZ_POSITIVE_STATE, spin_expectation_analytical};
 use threegui::{utils, ThreeUi, Vec3};
 
 mod quantum;
@@ -192,6 +192,16 @@ impl TemplateApp {
         )
         .into();
         label_line(three, spin_vector.into(), Color32::LIGHT_BLUE, "<S>");
+
+        // Draw spin vector
+        let spin_vector: mint::Vector3<f32> = spin_expectation_analytical(
+            self.theta,
+            self.b_field_strength,
+            self.time,
+        )
+        .into();
+        label_line(three, spin_vector.into(), Color32::from_rgb(0xff, 0x00, 0xff), "<S> (analytical)");
+
 
         // Draw tracing
         let paint = three.painter();

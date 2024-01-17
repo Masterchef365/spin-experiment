@@ -43,8 +43,8 @@ fn expi(t: f32) -> Complex {
 }
 
 pub fn psi(theta: f32, b_field_strength: f32, time: f32) -> SpinState {
-    // Magnitude of energy (same for both states
-    let energy = b_field_strength;
+    // Magnitude of energy (same for both states)
+    let energy = b_field_strength * H_BAR / 2.0;
     let omega = energy / H_BAR;
 
     // Energy eigenstates
@@ -54,15 +54,20 @@ pub fn psi(theta: f32, b_field_strength: f32, time: f32) -> SpinState {
     (psi_1 * expi(omega * time) - psi_2 * expi(-omega * time)) / Complex::from(2.)
 }
 
-pub fn spin_expectation(
-    theta: f32,
-    b_field_strength: f32,
-    time: f32,
-) -> Vector3 {
+pub fn spin_expectation(theta: f32, b_field_strength: f32, time: f32) -> Vector3 {
     let wave = psi(theta, b_field_strength, time);
     Vector3::new(
         expectation(wave, SX_OPERATOR),
         expectation(wave, SY_OPERATOR),
         expectation(wave, SZ_OPERATOR),
     )
+}
+
+pub fn spin_expectation_analytical(theta: f32, b_field_strength: f32, time: f32) -> Vector3 {
+    let energy = b_field_strength * H_BAR / 1.0;
+    let omega = energy / H_BAR;
+
+    let x = (H_BAR / 2.0) * (2. * theta).sin() * (1. - 2.0 * (-omega * time).cos()) / 2.0;
+
+    Vector3::new(x, 0., 0.)
 }
