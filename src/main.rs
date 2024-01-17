@@ -60,7 +60,6 @@ fn main() {
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 pub struct TemplateApp {
     theta: f32,
-    initial_state: SpinState,
     b_field_strength: f32,
     time: f32,
     play: bool,
@@ -79,7 +78,6 @@ impl Default for TemplateApp {
         Self {
             b_field_strength: 0.9,
             theta: 0.17,
-            initial_state: quantum::SZ_POSITIVE_STATE,
             time: 0.,
 
             play: true,
@@ -128,7 +126,6 @@ impl eframe::App for TemplateApp {
         if self.trace {
             let spin_vector: mint::Vector3<f32> = spin_expectation(
                 self.theta,
-                self.initial_state,
                 self.b_field_strength,
                 self.time,
             )
@@ -190,7 +187,6 @@ impl TemplateApp {
         // Draw spin vector
         let spin_vector: mint::Vector3<f32> = spin_expectation(
             self.theta,
-            self.initial_state,
             self.b_field_strength,
             self.time,
         )
@@ -217,7 +213,6 @@ impl TemplateApp {
     fn psi(&self) -> SpinState {
         quantum::psi(
             self.theta,
-            self.initial_state,
             self.b_field_strength,
             self.time,
         )
