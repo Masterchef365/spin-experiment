@@ -124,7 +124,7 @@ impl eframe::App for TemplateApp {
         }
 
         if self.trace {
-            let spin_vector: mint::Vector3<f32> = spin_expectation(
+            let spin_vector: mint::Vector3<f32> = spin_expectation_analytical(
                 self.theta,
                 self.b_field_strength,
                 self.time,

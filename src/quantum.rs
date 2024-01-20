@@ -64,10 +64,14 @@ pub fn spin_expectation(theta: f32, b_field_strength: f32, time: f32) -> Vector3
 }
 
 pub fn spin_expectation_analytical(theta: f32, b_field_strength: f32, time: f32) -> Vector3 {
-    let energy = b_field_strength * H_BAR / 1.0;
+    let energy = -b_field_strength * H_BAR / 2.0;
     let omega = energy / H_BAR;
 
-    let x = (H_BAR / 2.0) * (2. * theta).sin() * (1. - 2.0 * (-omega * time).cos()) / 2.0;
+    let twt = 2. * omega * time;
 
-    Vector3::new(x, 0., 0.)
+    Vector3::new(
+        (1.0 - twt.cos())*(2. * theta) / 2.,
+        -theta.sin() * twt.sin(),
+        1. + (twt.cos() - 1.) * theta.sin().powi(2)
+    ) * H_BAR / 2.
 }
