@@ -184,6 +184,7 @@ impl TemplateApp {
         let b_field: mint::Vector3<f32> = b_field(self.theta, self.b_field_strength).into();
         label_line(three, b_field.into(), Color32::from_rgb(222, 230, 44), "B");
 
+        /*
         // Draw spin vector
         let spin_vector: mint::Vector3<f32> = spin_expectation(
             self.theta,
@@ -192,6 +193,7 @@ impl TemplateApp {
         )
         .into();
         label_line(three, spin_vector.into(), Color32::LIGHT_BLUE, "<S>");
+        */
 
         // Draw spin vector
         let spin_vector: mint::Vector3<f32> = spin_expectation_analytical(
@@ -200,13 +202,13 @@ impl TemplateApp {
             self.time,
         )
         .into();
-        label_line(three, spin_vector.into(), Color32::from_rgb(0xff, 0x00, 0xff), "<S> (analytical)");
+        label_line(three, spin_vector.into(), Color32::from_rgb(0xff, 0x00, 0xff), "<S>");
 
 
         // Draw tracing
         let paint = three.painter();
         for pair in self.tracing.windows(2) {
-            paint.line(pair[0], pair[1], Stroke::new(1., Color32::LIGHT_BLUE));
+            paint.line(pair[0], pair[1], Stroke::new(1., Color32::from_rgb(0xff, 0x00, 0xff)));
         }
 
         /*
